@@ -26,7 +26,7 @@ class Campus extends Conexion {
 
             if ($this->Token->status === 'success') {
 
-                $statement = $this->db->prepare("SELECT DISTINCT u.email AS CORREO, c.fullname AS DIPLOMADO, cc.name AS CENTRO, DATE_FORMAT(FROM_UNIXTIME(c.startdate),'%Y-%m-%d') AS FECHA_INICIO_DIPLOMADO, u.firstname AS NOMBRES, u.lastname AS APELLIDOS, u.username AS DOCUMENTO, 
+                $statement = $this->db->prepare("SELECT DISTINCT u.email AS CORREO, c.fullname AS DIPLOMADO, c.id AS ID_DIPLOMADO, cc.name AS CENTRO, DATE_FORMAT(FROM_UNIXTIME(c.startdate),'%Y-%m-%d') AS FECHA_INICIO_DIPLOMADO, u.firstname AS NOMBRES, u.lastname AS APELLIDOS, u.username AS DOCUMENTO, 
                     (SELECT DATE_FORMAT(FROM_UNIXTIME(timeaccess),'%Y-%m-%d') FROM mdl_user_lastaccess WHERE userid = u.id and courseid = c.id) AS ULTIMO_INGRESO_CURSO 
                     FROM mdl_user_enrolments AS ue 
                     INNER JOIN mdl_enrol AS e on e.id = ue.enrolid 
@@ -73,7 +73,7 @@ class Campus extends Conexion {
 
             if ($this->Token->status === 'success') {
 
-                $statement = $this->db->prepare("SELECT DISTINCT u.email AS CORREO, c.fullname AS DIPLOMADO, cc.name AS CENTRO, DATE_FORMAT(FROM_UNIXTIME(c.startdate),'%Y-%m-%d') AS FECHA_INICIO_DIPLOMADO, u.firstname AS NOMBRES, u.lastname AS APELLIDOS, u.username AS DOCUMENTO, 
+                $statement = $this->db->prepare("SELECT DISTINCT u.email AS CORREO, c.fullname AS DIPLOMADO, c.id AS ID_DIPLOMADO, cc.name AS CENTRO, DATE_FORMAT(FROM_UNIXTIME(c.startdate),'%Y-%m-%d') AS FECHA_INICIO_DIPLOMADO, u.firstname AS NOMBRES, u.lastname AS APELLIDOS, u.username AS DOCUMENTO, 
                     (SELECT DATE_FORMAT(FROM_UNIXTIME(timeaccess),'%Y-%m-%d') FROM mdl_user_lastaccess WHERE userid = u.id and courseid = c.id) AS ULTIMO_INGRESO_CURSO 
                     FROM mdl_user_enrolments AS ue
                     INNER JOIN mdl_enrol AS e on e.id = ue.enrolid 
@@ -109,7 +109,7 @@ class Campus extends Conexion {
 
                             array_push($estudiantes, $result);
 
-                            $this->registrarSeguimientoCorreo($result['NOMBRE'], $result['APELLIDO'], $result['DOCUMENTO'], $result['CORREO'], $result['DIPLOMADO'], $result['CENTRO'], 'Participacion');
+                            $this->registrarSeguimientoCorreo($result['NOMBRES'], $result['APELLIDOS'], $result['DOCUMENTO'], $result['CORREO'], $result['DIPLOMADO'], $result['CENTRO'], 'Participacion');
                         }
                     }
                 }
@@ -129,7 +129,7 @@ class Campus extends Conexion {
 
             if ($this->Token->status === 'success') {
 
-                $statement = $this->db->prepare("SELECT u.firstname AS 'NOMBRE', u.lastname AS 'APELLIDO', u.username AS 'DOCUMENTO', u.email AS 'CORREO', c.fullname AS 'DIPLOMADO', cc.name AS 'CENTRO', ROUND( gg.finalgrade, 2) AS 'PROMEDIO' 
+                $statement = $this->db->prepare("SELECT u.firstname AS 'NOMBRES', u.lastname AS 'APELLIDOS', u.username AS 'DOCUMENTO', u.email AS 'CORREO', c.fullname AS 'DIPLOMADO', c.id AS ID_DIPLOMADO, cc.name AS 'CENTRO', ROUND( gg.finalgrade, 2) AS 'PROMEDIO' 
                     FROM mdl_course c 
                     INNER JOIN mdl_context AS ctx ON c.id = ctx.instanceid 
                     INNER JOIN mdl_role_assignments AS ra ON ra.contextid = ctx.id 
@@ -156,7 +156,7 @@ class Campus extends Conexion {
 
                     foreach ($estudiantes as $estudiante) {
 
-                        $this->registrarSeguimientoCorreo($estudiante['NOMBRE'], $estudiante['APELLIDO'], $estudiante['DOCUMENTO'], $estudiante['CORREO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO'], 'Aprobacion');
+                        $this->registrarSeguimientoCorreo($estudiante['NOMBRES'], $estudiante['APELLIDOS'], $estudiante['DOCUMENTO'], $estudiante['CORREO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO'], 'Aprobacion');
                     }
                 }
 
