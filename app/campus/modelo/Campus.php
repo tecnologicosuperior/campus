@@ -105,7 +105,7 @@ class Campus extends Conexion {
 
                         $promedio = $this->getPromedioEstudianteDiplomado($result['DOCUMENTO'], $result['CENTRO'], $result['DIPLOMADO']);
 
-                        if ($promedio === 0) {
+                        if ($promedio == 0) {
 
                             array_push($estudiantes, $result);
 
