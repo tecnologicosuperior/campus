@@ -43,6 +43,7 @@ class Campus extends Conexion {
                         WHERE CORREO = u.email 
                         AND TIPO_CORREO = 'Ingreso'
                     )
+                    AND cc.name NOT LIKE '%EXTENSION ACADEMICA%'
                     GROUP BY u.email, c.fullname
                 ");
 
@@ -90,6 +91,7 @@ class Campus extends Conexion {
                         WHERE CORREO = u.email 
                         AND TIPO_CORREO = 'Participacion'
                     )
+                    AND cc.name NOT LIKE '%EXTENSION ACADEMICA%'
                     GROUP BY u.email, c.fullname
                 ");
 
@@ -145,6 +147,7 @@ class Campus extends Conexion {
                         WHERE CORREO = u.email 
                         AND TIPO_CORREO = 'Aprobacion'
                     )
+                    AND cc.name NOT LIKE '%EXTENSION ACADEMICA%'
                     ORDER BY u.username
                 ");
 
