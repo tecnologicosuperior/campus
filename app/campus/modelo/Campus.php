@@ -164,6 +164,8 @@ class Campus extends Conexion {
                 }
 
                 return json_encode(array('status' => 'success', 'estudiantes' => $estudiantes));
+            } else {
+                return json_encode(array('status' => 'error', 'message' => 'Token Invalid'));
             }
 
         } catch (Exception $e) {
@@ -229,26 +231,31 @@ class Campus extends Conexion {
 
         try {
 
-            $statement = $this->db->prepare("SELECT u.id AS USUARIO, c.id AS DIPLOMADO, cc.name AS CENTRO, CASE WHEN gi.itemtype = 'course' THEN c.fullname + ' Course Total' ELSE gi.itemname END AS ACTIVIDAD, ROUND(gg.finalgrade, 2) AS NOTA 
-                FROM mdl_course AS c 
-                JOIN mdl_context AS ctx ON c.id = ctx.instanceid 
-                JOIN mdl_role_assignments AS ra ON ra.contextid = ctx.id 
-                JOIN mdl_user AS u ON u.id = ra.userid 
-                JOIN mdl_grade_grades AS gg ON gg.userid = u.id 
-                JOIN mdl_grade_items AS gi ON gi.id = gg.itemid 
-                JOIN mdl_course_categories as cc ON cc.id = c.category 
-                WHERE gi.courseid = c.id 
-                AND cc.name != 'EXTENSION ACADEMICA' 
-                AND c.visible = 1 
-                ORDER BY `Category` ASC
-            ");
+            if ($this->Token->status === 'success') {
 
-            $statement->execute();
+                $statement = $this->db->prepare("SELECT u.id AS USUARIO, c.id AS DIPLOMADO, cc.name AS CENTRO, CASE WHEN gi.itemtype = 'course' THEN c.fullname + ' Course Total' ELSE gi.itemname END AS ACTIVIDAD, ROUND(gg.finalgrade, 2) AS NOTA 
+                    FROM mdl_course AS c 
+                    JOIN mdl_context AS ctx ON c.id = ctx.instanceid 
+                    JOIN mdl_role_assignments AS ra ON ra.contextid = ctx.id 
+                    JOIN mdl_user AS u ON u.id = ra.userid 
+                    JOIN mdl_grade_grades AS gg ON gg.userid = u.id 
+                    JOIN mdl_grade_items AS gi ON gi.id = gg.itemid 
+                    JOIN mdl_course_categories as cc ON cc.id = c.category 
+                    WHERE gi.courseid = c.id 
+                    AND cc.name != 'EXTENSION ACADEMICA' 
+                    AND c.visible = 1 
+                    ORDER BY `Category` ASC
+                ");
 
-            return json_encode(array('status' => 'success', 'notas' => $statement->fetchAll(PDO::FETCH_ASSOC)));
+                $statement->execute();
+
+                return json_encode(array('status' => 'success', 'notas' => $statement->fetchAll(PDO::FETCH_ASSOC)));
+            
+            } else {
+                return json_encode(array('status' => 'error', 'message' => 'Token Invalid'));
+            }
             
         } catch (Exception $e) {
-
             return json_encode(array('status' => 'error', 'message' => $e->getMessage()));
         }
     }
@@ -257,28 +264,34 @@ class Campus extends Conexion {
 
         try {
 
-            $userId     = $request['userId'];
-            $courseId   = $request['courseId'];
+            if ($this->Token->status === 'success') {
 
-            $statement = $this->db->prepare("SELECT u.id AS USUARIO, c.id AS DIPLOMADO, cc.name AS CENTRO, CASE WHEN gi.itemtype = 'course' THEN c.fullname + ' Course Total' ELSE gi.itemname END AS ACTIVIDAD, ROUND(gg.finalgrade, 2) AS NOTA 
-                FROM mdl_course AS c 
-                JOIN mdl_context AS ctx ON c.id = ctx.instanceid 
-                JOIN mdl_role_assignments AS ra ON ra.contextid = ctx.id 
-                JOIN mdl_user AS u ON u.id = ra.userid 
-                JOIN mdl_grade_grades AS gg ON gg.userid = u.id 
-                JOIN mdl_grade_items AS gi ON gi.id = gg.itemid 
-                JOIN mdl_course_categories as cc ON cc.id = c.category 
-                WHERE gi.courseid = c.id 
-                AND cc.name != 'EXTENSION ACADEMICA' 
-                AND c.visible = 1 
-                AND u.id = :userId
-                AND c.id = :courseId
-                ORDER BY `Category` ASC
-            ");
+                $userId     = $request['userId'];
+                $courseId   = $request['courseId'];
 
-            $statement->execute(array(':userId' => $userId, ':courseId' => $courseId));
+                $statement = $this->db->prepare("SELECT u.id AS USUARIO, c.id AS DIPLOMADO, cc.name AS CENTRO, CASE WHEN gi.itemtype = 'course' THEN c.fullname + ' Course Total' ELSE gi.itemname END AS ACTIVIDAD, ROUND(gg.finalgrade, 2) AS NOTA 
+                    FROM mdl_course AS c 
+                    JOIN mdl_context AS ctx ON c.id = ctx.instanceid 
+                    JOIN mdl_role_assignments AS ra ON ra.contextid = ctx.id 
+                    JOIN mdl_user AS u ON u.id = ra.userid 
+                    JOIN mdl_grade_grades AS gg ON gg.userid = u.id 
+                    JOIN mdl_grade_items AS gi ON gi.id = gg.itemid 
+                    JOIN mdl_course_categories as cc ON cc.id = c.category 
+                    WHERE gi.courseid = c.id 
+                    AND cc.name != 'EXTENSION ACADEMICA' 
+                    AND c.visible = 1 
+                    AND u.id = :userId
+                    AND c.id = :courseId
+                    ORDER BY `Category` ASC
+                ");
 
-            return json_encode(array('status' => 'success', 'notas' => $statement->fetch(PDO::FETCH_ASSOC)));
+                $statement->execute(array(':userId' => $userId, ':courseId' => $courseId));
+
+                return json_encode(array('status' => 'success', 'notas' => $statement->fetch(PDO::FETCH_ASSOC)));
+
+            } else {
+                return json_encode(array('status' => 'error', 'message' => 'Token Invalid'));
+            }
             
         } catch (Exception $e) {
 
