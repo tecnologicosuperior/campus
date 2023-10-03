@@ -287,7 +287,7 @@ class Campus extends Conexion {
 
                 $statement->execute(array(':userId' => $userId, ':courseId' => $courseId));
 
-                return json_encode(array('status' => 'success', 'notas' => $statement->fetch(PDO::FETCH_ASSOC)));
+                return json_encode(array('status' => 'success', 'notas' => $statement->fetchAll(PDO::FETCH_ASSOC)));
 
             } else {
                 return json_encode(array('status' => 'error', 'message' => 'Token Invalid'));
