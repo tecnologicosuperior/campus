@@ -55,7 +55,7 @@ class Campus extends Conexion {
 
                     foreach ($estudiantes as $estudiante) {
 
-                        $this->registrarSeguimientoCorreo($estudiante['NOMBRES'], $estudiante['APELLIDOS'], $estudiante['DOCUMENTO'], $estudiante['CORREO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO'], 'Ingreso');
+                        //$this->registrarSeguimientoCorreo($estudiante['NOMBRES'], $estudiante['APELLIDOS'], $estudiante['DOCUMENTO'], $estudiante['CORREO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO'], 'Ingreso');
                     }
                 }
     
@@ -111,7 +111,7 @@ class Campus extends Conexion {
 
                             array_push($estudiantes, $result);
 
-                            $this->registrarSeguimientoCorreo($result['NOMBRES'], $result['APELLIDOS'], $result['DOCUMENTO'], $result['CORREO'], $result['DIPLOMADO'], $result['CENTRO'], 'Participacion');
+                            //$this->registrarSeguimientoCorreo($result['NOMBRES'], $result['APELLIDOS'], $result['DOCUMENTO'], $result['CORREO'], $result['DIPLOMADO'], $result['CENTRO'], 'Participacion');
                         }
                     }
                 }
