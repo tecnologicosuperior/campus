@@ -91,7 +91,7 @@ class Campus extends Conexion {
                         WHERE CORREO = u.email 
                         AND TIPO_CORREO = 'Participacion'
                     )
-                    AND cc.name NOT LIKE '%EXTENSION ACADEMICA%'
+                    AND cc.name NOT LIKE '%BASE%'
                     GROUP BY u.email, c.fullname
                 ");
 
@@ -141,13 +141,13 @@ class Campus extends Conexion {
                     INNER JOIN mdl_course_categories AS cc ON cc.id = c.category 
                     WHERE gi.courseid = c.id AND gi.itemtype = 'course' 
                     AND c.visible = 1 
-                    AND ROUND( gg.finalgrade, 2 ) >= 19.5 
+                    AND ROUND( gg.finalgrade, 2 ) >= 60 
                     AND NOT EXISTS (
                         SELECT 1 FROM seguimiento_correos 
                         WHERE CORREO = u.email 
                         AND TIPO_CORREO = 'Aprobacion'
                     )
-                    AND cc.name NOT LIKE '%EXTENSION ACADEMICA%'
+                    AND cc.name NOT LIKE '%BASE%'
                     ORDER BY u.username
                 ");
 
@@ -242,7 +242,7 @@ class Campus extends Conexion {
                     JOIN mdl_grade_items AS gi ON gi.id = gg.itemid 
                     JOIN mdl_course_categories as cc ON cc.id = c.category 
                     WHERE gi.courseid = c.id 
-                    AND cc.name != 'EXTENSION ACADEMICA' 
+                    AND cc.name != 'BASE' 
                     AND c.visible = 1 
                     ORDER BY `Category` ASC
                 ");
@@ -278,7 +278,7 @@ class Campus extends Conexion {
                     JOIN mdl_grade_items AS gi ON gi.id = gg.itemid 
                     JOIN mdl_course_categories as cc ON cc.id = c.category 
                     WHERE gi.courseid = c.id 
-                    AND cc.name != 'EXTENSION ACADEMICA' 
+                    AND cc.name != 'BASE' 
                     AND c.visible = 1 
                     AND u.id = :userId
                     AND c.id = :courseId
