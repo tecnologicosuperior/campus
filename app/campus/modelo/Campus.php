@@ -147,6 +147,8 @@ class Campus extends Conexion {
                         WHERE CORREO = u.email 
                         AND TIPO_CORREO = 'Aprobacion'
                     )
+                    AND (SELECT COUNT(*) AS CALIFICACIONES FROM mdl_course AS cu JOIN mdl_context AS ctx ON cu.id = ctx.instanceid JOIN mdl_role_assignments AS ra ON ra.contextid = ctx.id JOIN mdl_user AS us ON us.id = ra.userid JOIN mdl_grade_grades AS gg ON gg.userid = us.id JOIN mdl_grade_items AS gi ON gi.id = gg.itemid JOIN mdl_course_categories as cc ON cc.id = cu.category WHERE gi.courseid = cu.id AND cc.name != 'BASE' AND c.visible = 1 AND us.id = u.id AND c.id = c.id)
+                        >= 6
                     AND cc.name NOT LIKE '%BASE%'
                     ORDER BY u.username
                 ");
@@ -177,7 +179,7 @@ class Campus extends Conexion {
 
         try {
 
-            $statement = $this->db->prepare("SELECT ROUND( SUM( gg.finalgrade ) / 5, 2) AS PROMEDIO 
+            $statement = $this->db->prepare("SELECT ROUND(SUM( gg.finalgrade ) / 5, 2) AS PROMEDIO 
                 FROM mdl_course AS c 
                 INNER JOIN mdl_context AS ctx ON c.id = ctx.instanceid 
                 INNER JOIN mdl_role_assignments AS ra ON ra.contextid = ctx.id 
