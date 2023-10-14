@@ -148,7 +148,7 @@ class Campus extends Conexion {
                         AND TIPO_CORREO = 'Aprobacion'
                     )
                     AND (SELECT COUNT(*) AS CALIFICACIONES FROM mdl_course AS cu JOIN mdl_context AS ctx ON cu.id = ctx.instanceid JOIN mdl_role_assignments AS ra ON ra.contextid = ctx.id JOIN mdl_user AS us ON us.id = ra.userid JOIN mdl_grade_grades AS gg ON gg.userid = us.id JOIN mdl_grade_items AS gi ON gi.id = gg.itemid JOIN mdl_course_categories as cc ON cc.id = cu.category WHERE gi.courseid = cu.id AND cc.name != 'BASE' AND c.visible = 1 AND us.id = u.id AND c.id = c.id)
-                        >= 6
+                        >= 5
                     AND cc.name NOT LIKE '%BASE%'
                     ORDER BY u.username
                 ");
