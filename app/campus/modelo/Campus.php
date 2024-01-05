@@ -89,7 +89,7 @@ class Campus extends Conexion {
                     AND NOT EXISTS (
                         SELECT 1 FROM seguimiento_correos 
                         WHERE CORREO = u.email 
-                        AND TIPO_CORREO = 'Participacion'
+                        AND (TIPO_CORREO = 'Participacion' OR TIPO_CORREO = 'Aprobacion') 
                     )
                     AND cc.name NOT LIKE '%BASE%'
                     GROUP BY u.email, c.fullname
@@ -111,7 +111,7 @@ class Campus extends Conexion {
 
                             array_push($estudiantes, $result);
 
-                            //$this->registrarSeguimientoCorreo($result['NOMBRES'], $result['APELLIDOS'], $result['DOCUMENTO'], $result['CORREO'], $result['DIPLOMADO'], $result['CENTRO'], 'Participacion');
+                            $this->registrarSeguimientoCorreo($result['NOMBRES'], $result['APELLIDOS'], $result['DOCUMENTO'], $result['CORREO'], $result['DIPLOMADO'], $result['CENTRO'], 'Participacion');
                         }
                     }
                 }
