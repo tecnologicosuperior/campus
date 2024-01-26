@@ -12,7 +12,7 @@ class Env {
     public function __construct(){
 
         $this->Env = new Dotenv();
-        $this->Env->load('../../../../../../envs/.env-campus');
+        $this->Env->load('../../../../../envs/.env-campus');
 
         $this->VariablesEntorno = $_ENV;
     }
