@@ -144,7 +144,8 @@ class Campus extends Conexion {
                     AND ROUND( gg.finalgrade, 2 ) >= 60 
                     AND NOT EXISTS (
                         SELECT 1 FROM seguimiento_correos 
-                        WHERE CORREO = u.email 
+                        WHERE CORREO = u.email
+                        AND DIPLOMADO = c.fullname
                         AND TIPO_CORREO = 'Aprobacion'
                     )
                 ");
