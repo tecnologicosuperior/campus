@@ -55,7 +55,7 @@ class Campus extends Conexion {
 
                     foreach ($estudiantes as $estudiante) {
 
-                        //$this->registrarSeguimientoCorreo($estudiante['NOMBRES'], $estudiante['APELLIDOS'], $estudiante['DOCUMENTO'], $estudiante['CORREO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO'], 'Ingreso');
+                        $this->registrarSeguimientoCorreo($estudiante['NOMBRES'], $estudiante['APELLIDOS'], $estudiante['DOCUMENTO'], $estudiante['CORREO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO'], 'Ingreso');
                     }
                 }
     
@@ -221,6 +221,7 @@ class Campus extends Conexion {
             ));
 
             return json_encode(array('status' => 'success', 'message' => 'Seguimiento de correo registrado correctamente'));
+
         } catch (Exception $e) {
             return json_encode(array('status' => 'error', 'message' => $e->getMessage()));
         }
