@@ -37,13 +37,14 @@ class Campus extends Conexion {
                     INNER JOIN mdl_role r ON r.id = e.roleid 
                     WHERE ul.timeaccess IS NULL 
                     AND r.id = 5 
+                    AND c.visible = 1 
                     AND u.email NOT LIKE '%tecnologicosuperior.edu.co%' 
                     AND NOT EXISTS (
                         SELECT 1 FROM seguimiento_correos 
                         WHERE CORREO = u.email 
                         AND TIPO_CORREO = 'Ingreso'
                     )
-                    AND cc.name NOT LIKE '%EXTENSION ACADEMICA%'
+                    AND cc.name LIKE '%ACTIVOS%'
                     GROUP BY u.email, c.fullname
                 ");
 
@@ -55,7 +56,7 @@ class Campus extends Conexion {
 
                     foreach ($estudiantes as $estudiante) {
 
-                        $this->registrarSeguimientoCorreo($estudiante['NOMBRES'], $estudiante['APELLIDOS'], $estudiante['DOCUMENTO'], $estudiante['CORREO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO'], 'Ingreso');
+                        //$this->registrarSeguimientoCorreo($estudiante['NOMBRES'], $estudiante['APELLIDOS'], $estudiante['DOCUMENTO'], $estudiante['CORREO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO'], 'Ingreso');
                     }
                 }
     
@@ -85,6 +86,7 @@ class Campus extends Conexion {
                     INNER JOIN mdl_role r ON r.id = e.roleid 
                     WHERE ul.timeaccess IS NOT NULL 
                     AND r.id = 5 
+                    AND c.visible = 1 
                     AND u.email NOT LIKE '%tecnologicosuperior.edu.co%' 
                     AND NOT EXISTS (
                         SELECT 1 FROM seguimiento_correos 
