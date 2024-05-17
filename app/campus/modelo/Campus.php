@@ -148,6 +148,7 @@ class Campus extends Conexion {
                         SELECT 1 FROM seguimiento_correos 
                         WHERE CORREO = u.email
                         AND DIPLOMADO = c.fullname
+                        AND CENTRO = cc.name
                         AND TIPO_CORREO = 'Aprobacion'
                     )
                 ");
