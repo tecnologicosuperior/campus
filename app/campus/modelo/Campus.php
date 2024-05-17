@@ -142,6 +142,7 @@ class Campus extends Conexion {
                     INNER JOIN mdl_grade_items AS gi ON gi.id = gg.itemid 
                     INNER JOIN mdl_course_categories AS cc ON cc.id = c.category 
                     WHERE gi.courseid = c.id AND gi.itemtype = 'course' 
+                    AND u.email = 'dpalaciovalencia99@gmail.com'
                     AND c.visible = 1 
                     AND ROUND( gg.finalgrade, 2 ) >= 60 
                     AND NOT EXISTS (
