@@ -20,11 +20,39 @@ class Campus extends Conexion {
         $this->Token = json_decode($this->JWToken->verify());
     }
 
+    public function getCentroCierreFecha($fecha){
+        $statement = $this->db->prepare("SELECT CENTRO FROM centros WHERE FECHA_CIERRE = :fecha");
+        $statement->execute(array(':fecha' => $fecha));
+        return $statement->fetch()['CENTRO'];
+    }
+
+    public function getCentroSinIngresoFecha($fecha){
+        $statement = $this->db->prepare("SELECT CENTRO FROM centros WHERE FECHA_SIN_INGRESAR = :fecha");
+        $statement->execute(array(':fecha' => $fecha));
+        return $statement->fetch()['CENTRO'];
+    }
+
+    public function getCentroSinParticipacionFecha($fecha){
+        $statement = $this->db->prepare("SELECT CENTRO FROM centros WHERE FECHA_SIN_PARTICIPAR = :fecha");
+        $statement->execute(array(':fecha' => $fecha));
+        return $statement->fetch()['CENTRO'];
+    }
+
+    public function getEstudiantesCentro($centro){
+        $statement = $this->db->prepare("SELECT u.username AS DOCUMENTO, u.firstname AS NOMBRE, u.lastname AS APELLIDO, u.email AS CORREO, c.shortname AS DIPLOMADO, cc.name AS CENTRO 
+        FROM mdl_course AS c JOIN mdl_context AS ctx ON c.id = ctx.instanceid JOIN mdl_role_assignments AS ra ON ra.contextid = ctx.id JOIN mdl_user AS u ON u.id = ra.userid 
+        INNER JOIN mdl_course_categories cc ON c.category = cc.id WHERE ra.roleid = 5 AND cc.name = :centro");
+        $statement->execute(array(':centro' => $centro));
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getEstudiantesSinIngresar() {
 
         try {
 
             if ($this->Token->status === 'success') {
+
+                $centro = $this->getCentroSinIngresoFecha(date('Y-m-d'));
 
                 $statement = $this->db->prepare("SELECT DISTINCT u.email AS CORREO, c.fullname AS DIPLOMADO, c.id AS ID_DIPLOMADO, cc.name AS CENTRO, DATE_FORMAT(FROM_UNIXTIME(c.startdate),'%Y-%m-%d') AS FECHA_INICIO_DIPLOMADO, u.firstname AS NOMBRES, u.lastname AS APELLIDOS, u.username AS DOCUMENTO, 
                     (SELECT DATE_FORMAT(FROM_UNIXTIME(timeaccess),'%Y-%m-%d') FROM mdl_user_lastaccess WHERE userid = u.id and courseid = c.id) AS ULTIMO_INGRESO_CURSO 
@@ -44,11 +72,11 @@ class Campus extends Conexion {
                         WHERE CORREO = u.email 
                         AND TIPO_CORREO = 'Ingreso'
                     )
-                    AND cc.name LIKE '%ACTIVOS%'
+                    AND cc.name = :centro
                     GROUP BY u.email, c.fullname
                 ");
 
-                $statement->execute();
+                $statement->execute(array(':centro' => $centro));
 
                 $estudiantes = $statement->fetchAll(PDO::FETCH_ASSOC);
 
@@ -75,6 +103,8 @@ class Campus extends Conexion {
 
             if ($this->Token->status === 'success') {
 
+                $centro = $this->getCentroSinParticipacionFecha(date('Y-m-d'));
+
                 $statement = $this->db->prepare("SELECT DISTINCT u.email AS CORREO, c.fullname AS DIPLOMADO, c.id AS ID_DIPLOMADO, cc.name AS CENTRO, DATE_FORMAT(FROM_UNIXTIME(c.startdate),'%Y-%m-%d') AS FECHA_INICIO_DIPLOMADO, u.firstname AS NOMBRES, u.lastname AS APELLIDOS, u.username AS DOCUMENTO, 
                     (SELECT DATE_FORMAT(FROM_UNIXTIME(timeaccess),'%Y-%m-%d') FROM mdl_user_lastaccess WHERE userid = u.id and courseid = c.id) AS ULTIMO_INGRESO_CURSO 
                     FROM mdl_user_enrolments AS ue
@@ -93,11 +123,11 @@ class Campus extends Conexion {
                         WHERE CORREO = u.email 
                         AND (TIPO_CORREO = 'Participacion' OR TIPO_CORREO = 'Aprobacion') 
                     )
-                    AND cc.name NOT LIKE '%BASE%'
+                    AND cc.name = :centro
                     GROUP BY u.email, c.fullname
                 ");
 
-                $statement->execute();
+                $statement->execute(array(':centro' => $centro));
 
                 $results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
@@ -170,6 +200,47 @@ class Campus extends Conexion {
                 return json_encode(array('status' => 'error', 'message' => 'Token Invalid'));
             }
 
+        } catch (Exception $e) {
+            return json_encode(array('status' => 'error', 'message' => $e->getMessage()));
+        }
+    }
+
+    public function getEstudiantesCierre() {
+
+        try {
+
+            if ($this->Token->status === 'success') {
+
+                $centro = $this->getCentroCierreFecha(date('Y-m-d'));
+
+                $estudiantes = $this->getEstudiantesCentro($centro);
+
+                $estudiantesCierre = array();
+
+                if (!is_null($estudiantes)) {
+
+                    foreach ($estudiantes as $estudiante) {
+
+                        $promedio = $this->getPromedioEstudianteDiplomado($estudiante['DOCUMENTO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO']);
+
+                        $datos = [
+                            'NOMBRES' => $estudiante['NOMBRE'],
+                            'APELLIDOS' => $estudiante['APELLIDO'],
+                            'DOCUMENTO' => $estudiante['DOCUMENTO'],
+                            'CORREO' => $estudiante['CORREO'],
+                            'DIPLOMADO' => $estudiante['DIPLOMADO'],
+                            'CENTRO' => $estudiante['CENTRO'],
+                            'PROMEDIO' => $promedio
+                        ];
+
+                        array_push($estudiantesCierre, $datos);
+
+                        $this->registrarSeguimientoCorreo($estudiante['NOMBRE'], $estudiante['APELLIDO'], $estudiante['DOCUMENTO'], $estudiante['CORREO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO'], 'Cierre');
+                    }
+                }
+
+                return json_encode(array('status' => 'success', 'estudiantes' => $estudiantes));
+            }
         } catch (Exception $e) {
             return json_encode(array('status' => 'error', 'message' => $e->getMessage()));
         }
