@@ -221,6 +221,10 @@ class Campus extends Conexion {
 
                     foreach ($estudiantes as $estudiante) {
 
+                        if ($this->verificarSeguimientoCorreo($estudiante['CORREO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO'], 'Cierre') > 0) {
+                            continue;
+                        }
+
                         $promedio = $this->getPromedioEstudianteDiplomado($estudiante['DOCUMENTO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO']);
 
                         $datos = [
@@ -230,8 +234,7 @@ class Campus extends Conexion {
                             'CORREO' => $estudiante['CORREO'],
                             'DIPLOMADO' => $estudiante['DIPLOMADO'],
                             'CENTRO' => $estudiante['CENTRO'],
-                            'PROMEDIO' => $promedio,
-                            'PRUEBA' => "Test"
+                            'PROMEDIO' => $promedio
                         ];
 
                         array_push($estudiantesCierre, $datos);
@@ -273,7 +276,26 @@ class Campus extends Conexion {
                 ':centro' => $centro
             ));
 
-            return $statement->fetch(PDO::FETCH_ASSOC)['PROMEDIO'];
+            return $statement->fetch(PDO::FETCH_ASSOC)['PROMEDIO'] ?? 0;
+
+        } catch (Exception $e) {
+            return json_encode(array('status' => 'error', 'message' => $e->getMessage()));
+        }
+    }
+
+    public function verificarSeguimientoCorreo($correo, $diplomado, $centro, $tipoCorreo) {
+
+        try {
+
+            $statement = $this->db->prepare("SELECT COUNT(*) AS TOTAL FROM seguimiento_correos WHERE CORREO = :correo AND DIPLOMADO = :diplomado AND CENTRO = :centro AND TIPO_CORREO = :tipoCorreo");
+            $statement->execute(array(
+                ':correo' => $correo,
+                ':diplomado' => $diplomado,
+                ':centro' => $centro,
+                ':tipoCorreo' => $tipoCorreo
+            ));
+
+            return $statement->fetch(PDO::FETCH_ASSOC)['TOTAL'] > 0;
 
         } catch (Exception $e) {
             return json_encode(array('status' => 'error', 'message' => $e->getMessage()));
