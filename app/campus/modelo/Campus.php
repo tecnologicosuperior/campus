@@ -230,7 +230,8 @@ class Campus extends Conexion {
                             'CORREO' => $estudiante['CORREO'],
                             'DIPLOMADO' => $estudiante['DIPLOMADO'],
                             'CENTRO' => $estudiante['CENTRO'],
-                            'PROMEDIO' => $promedio
+                            'PROMEDIO' => $promedio,
+                            'PRUEBA' => "Test"
                         ];
 
                         array_push($estudiantesCierre, $datos);
@@ -239,7 +240,7 @@ class Campus extends Conexion {
                     }
                 }
 
-                return json_encode(array('status' => 'success', 'estudiantes' => $estudiantes));
+                return json_encode(array('status' => 'success', 'estudiantes' => $estudiantesCierre));
             }
         } catch (Exception $e) {
             return json_encode(array('status' => 'error', 'message' => $e->getMessage()));
