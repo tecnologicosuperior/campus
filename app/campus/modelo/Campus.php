@@ -173,6 +173,7 @@ class Campus extends Conexion {
                 $statement->execute();
 
                 $estudiantes = $statement->fetchAll(PDO::FETCH_ASSOC);
+                $estudiantesAprobados = [];
 
                 if (!is_null($estudiantes)) {
 
@@ -182,11 +183,13 @@ class Campus extends Conexion {
                             continue;
                         }
 
+                        array_push($estudiantesAprobados, $estudiante);
+
                         $this->registrarSeguimientoCorreo($estudiante['NOMBRES'], $estudiante['APELLIDOS'], $estudiante['DOCUMENTO'], $estudiante['CORREO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO'], 'Aprobacion');
                     }
                 }
 
-                return json_encode(array('status' => 'success', 'estudiantes' => $estudiantes));
+                return json_encode(array('status' => 'success', 'estudiantes' => $estudiantesAprobados));
             } else {
                 return json_encode(array('status' => 'error', 'message' => 'Token Invalid'));
             }
