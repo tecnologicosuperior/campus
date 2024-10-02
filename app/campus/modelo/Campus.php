@@ -66,12 +66,7 @@ class Campus extends Conexion {
                     WHERE ul.timeaccess IS NULL 
                     AND r.id = 5 
                     AND c.visible = 1 
-                    AND u.email NOT LIKE '%tecnologicosuperior.edu.co%' 
-                    AND NOT EXISTS (
-                        SELECT 1 FROM seguimiento_correos 
-                        WHERE CORREO = u.email 
-                        AND TIPO_CORREO = 'Ingreso'
-                    )
+                    AND u.email NOT LIKE '%tecnologicosuperior.edu.co%'
                     AND cc.name = :centro
                     GROUP BY u.email, c.fullname
                 ");
@@ -117,12 +112,7 @@ class Campus extends Conexion {
                     WHERE ul.timeaccess IS NOT NULL 
                     AND r.id = 5 
                     AND c.visible = 1 
-                    AND u.email NOT LIKE '%tecnologicosuperior.edu.co%' 
-                    AND NOT EXISTS (
-                        SELECT 1 FROM seguimiento_correos 
-                        WHERE CORREO = u.email 
-                        AND (TIPO_CORREO = 'Participacion' OR TIPO_CORREO = 'Aprobacion') 
-                    )
+                    AND u.email NOT LIKE '%tecnologicosuperior.edu.co%'
                     AND cc.name = :centro
                     GROUP BY u.email, c.fullname
                 ");
@@ -142,6 +132,10 @@ class Campus extends Conexion {
                         if ($promedio == 0) {
 
                             array_push($estudiantes, $result);
+
+                            if ($this->verificarSeguimientoCorreo($result['CORREO'], $result['DIPLOMADO'], $result['CENTRO'], 'Participacion') > 0) {
+                                continue;
+                            }
 
                             $this->registrarSeguimientoCorreo($result['NOMBRES'], $result['APELLIDOS'], $result['DOCUMENTO'], $result['CORREO'], $result['DIPLOMADO'], $result['CENTRO'], 'Participacion');
                         }
@@ -173,14 +167,7 @@ class Campus extends Conexion {
                     INNER JOIN mdl_course_categories AS cc ON cc.id = c.category 
                     WHERE gi.courseid = c.id AND gi.itemtype = 'course' 
                     AND c.visible = 1 
-                    AND ROUND( gg.finalgrade, 2 ) >= 60 
-                    AND NOT EXISTS (
-                        SELECT 1 FROM seguimiento_correos 
-                        WHERE CORREO = u.email
-                        AND DIPLOMADO = c.fullname
-                        AND CENTRO = cc.name
-                        AND TIPO_CORREO = 'Aprobacion'
-                    )
+                    AND ROUND( gg.finalgrade, 2 ) >= 60
                 ");
 
                 $statement->execute();
@@ -190,6 +177,10 @@ class Campus extends Conexion {
                 if (!is_null($estudiantes)) {
 
                     foreach ($estudiantes as $estudiante) {
+
+                        if ($this->verificarSeguimientoCorreo($estudiante['CORREO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO'], 'Aprobacion') > 0) {
+                            continue;
+                        }
 
                         $this->registrarSeguimientoCorreo($estudiante['NOMBRES'], $estudiante['APELLIDOS'], $estudiante['DOCUMENTO'], $estudiante['CORREO'], $estudiante['DIPLOMADO'], $estudiante['CENTRO'], 'Aprobacion');
                     }
